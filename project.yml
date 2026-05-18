@@ -1,19 +1,25 @@
-name: DunenDashboard
+name: Aptum Dashboard
+
 options:
   bundleIdPrefix: com.crumies
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "26.0"
+
 settings:
   base:
     SWIFT_VERSION: "5.0"
+
 targets:
   DunenDashboard:
     type: application
     platform: iOS
+
     sources:
       - path: Sources
+
     resources:
       - path: Assets.xcassets
+
     info:
       path: Info.plist
       properties:
@@ -21,10 +27,13 @@ targets:
         CFBundleIdentifier: com.crumies.DunenDashboard
         CFBundleShortVersionString: "1.1"
         CFBundleVersion: "2"
-        NSBluetoothAlwaysUsageDescription: This app uses Bluetooth to connect to the DUNEN controller.
-        NSLocationWhenInUseUsageDescription: This app does not use GPS for dashboard speed.
-        NSMotionUsageDescription: This app does not use phone motion sensors for ride data.
+
         UILaunchScreen: {}
+
+        NSBluetoothAlwaysUsageDescription: This app uses Bluetooth to connect to the  controller.
+        NSLocationWhenInUseUsageDescription: This app does not use GPS for dashboard speed.
+        NSMotionUsageDescription: This app does not use phone motion sensors.
+
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.crumies.DunenDashboard
