@@ -16,17 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Clean old generated files
-        run: |
-          rm -rf DunenDashboard.xcodeproj build Payload DunenDashboard-unsigned.ipa
-
       - name: Install XcodeGen
         run: brew install xcodegen
 
-      - name: Generate clean Xcode project
+      - name: Generate Xcode project
         run: xcodegen generate --spec project.yml
 
-      - name: Build unsigned app
+      - name: Build app
         run: |
           xcodebuild clean build \
             -project DunenDashboard.xcodeproj \
@@ -39,15 +35,14 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             -derivedDataPath build
 
-      - name: Create unsigned IPA
+      - name: Create IPA
         run: |
-          mkdir -p Payload
-          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" -type d | head -n 1)
-          cp -R "$APP_PATH" Payload/
-          zip -r DunenDashboard-unsigned.ipa Payload
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/DunenDashboard.app Payload/
+          zip -r DunenDashboard.ipa Payload
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: DunenDashboard-unsigned-ipa
-          path: DunenDashboard-unsigned.ipa
+          name: DunenDashboard-IPA
+          path: DunenDashboard.ipa
