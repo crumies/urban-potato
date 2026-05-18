@@ -20,13 +20,13 @@ jobs:
         run: |
           xcodegen generate --spec project.yml
           ls -la
-          ls -la AptumDashboard.xcodeproj
+          ls -la DunenDashboard.xcodeproj
 
       - name: Build app
         run: |
           xcodebuild clean build \
-            -project AptumDashboard.xcodeproj \
-            -scheme AptumDashboard \
+            -project DunenDashboard.xcodeproj \
+            -scheme DunenDashboard \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
@@ -38,11 +38,11 @@ jobs:
       - name: Create IPA
         run: |
           mkdir -p Payload
-          cp -R build/Build/Products/Release-iphoneos/AptumDashboard.app Payload/
-          zip -r AptumDashboard.ipa Payload
+          cp -R build/Build/Products/Release-iphoneos/DunenDashboard.app Payload/
+          zip -r DunenDashboard.ipa Payload
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: AptumDashboard-IPA
-          path: AptumDashboard.ipa
+          name: DunenDashboard-IPA
+          path: DunenDashboard.ipa
