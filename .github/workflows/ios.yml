@@ -1,33 +1,53 @@
-name: DunenDashboard
-options:
-  bundleIdPrefix: com.crumies
-  deploymentTarget:
-    iOS: "16.0"
-settings:
-  base:
-    SWIFT_VERSION: "5.0"
-targets:
-  DunenDashboard:
-    type: application
-    platform: iOS
-    sources:
-      - path: Sources
-    resources:
-      - path: Assets.xcassets
-    info:
-      path: Info.plist
-      properties:
-        CFBundleDisplayName: Dunen
-        CFBundleIdentifier: com.crumies.DunenDashboard
-        CFBundleShortVersionString: "1.1"
-        CFBundleVersion: "2"
-        NSBluetoothAlwaysUsageDescription: This app uses Bluetooth to connect to the DUNEN controller.
-        NSLocationWhenInUseUsageDescription: This app does not use GPS for dashboard speed.
-        NSMotionUsageDescription: This app does not use phone motion sensors for ride data.
-        UILaunchScreen: {}
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.crumies.DunenDashboard
-        TARGETED_DEVICE_FAMILY: "1"
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        CODE_SIGN_STYLE: Manual
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clean old generated files
+        run: |
+          rm -rf DunenDashboard.xcodeproj build Payload DunenDashboard-unsigned.ipa
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate clean Xcode project
+        run: xcodegen generate --spec project.yml
+
+      - name: Build unsigned app
+        run: |
+          xcodebuild clean build \
+            -project DunenDashboard.xcodeproj \
+            -scheme DunenDashboard \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -derivedDataPath build
+
+      - name: Create unsigned IPA
+        run: |
+          mkdir -p Payload
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -name "*.app" -type d | head -n 1)
+          cp -R "$APP_PATH" Payload/
+          zip -r DunenDashboard-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: DunenDashboard-unsigned-ipa
+          path: DunenDashboard-unsigned.ipa
